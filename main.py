@@ -3,7 +3,7 @@ import time
 from tkinter import *
 
 
-class Stoper(Frame):
+class Stopwatch(Frame):
     def __init__(self, root, width, height):
         super().__init__()
         self.start_time = 0
@@ -100,7 +100,7 @@ def main():
     height = 500
 
     root = Tk()
-    stoper = Stoper(root, width, height)
+    stopwatch = Stopwatch(root, width, height)
     root.geometry(str(width) + "x" + str(height))
     root.mainloop()
 
