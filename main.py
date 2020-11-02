@@ -9,15 +9,19 @@ class Stopwatch(Frame):
         self.start_time = 0
         self.time = 0
         self.time_counted = 0
+        self.highest = 0
+        self.lowest = 0
         self.started = False
-        self.milliseconds_line_len = (width + height) / 6
-        self.seconds_line_len = (width + height) / 8
-        self.minutes_line_len = (width + height) / 12
-        self.x = width / 2
+        self.milliseconds_line_len = height / 3
+        self.seconds_line_len = height / 4
+        self.minutes_line_len = height / 6
+        self.x = (width - 200) / 2
         self.y = height / 2
-        self.canvas = Canvas(self)
+        self.canvas = Canvas(self, width=700, height=450)
         self.master.title("Stopwatch")
         self.pack(fill=BOTH, expand=1)
+        self.best_score_text = self.canvas.create_text(width - 200, 100)
+        self.worst_score_text = self.canvas.create_text(width - 200, 200)
         self.milliseconds_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.milliseconds_line_len)
         self.seconds_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.seconds_line_len)
         self.minutes_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.minutes_line_len)
@@ -29,9 +33,9 @@ class Stopwatch(Frame):
         self.button_frame.columnconfigure(1, weight=1)
         self.reset_button.grid(row=0, column=0, sticky=W + E)
         self.button.grid(row=0, column=1, sticky=W + E)
-        self.init_clock_face()
+        self.init_clock_face(width, height)
 
-    def init_clock_face(self):
+    def init_clock_face(self, width, height):
         self.canvas.create_oval(self.x - self.milliseconds_line_len - 30, self.y + self.milliseconds_line_len + 30,
                                 self.x + self.milliseconds_line_len + 30,
                                 self.y - self.milliseconds_line_len - 30)
@@ -41,6 +45,10 @@ class Stopwatch(Frame):
                                     round(self.y + (self.milliseconds_line_len + 20) * math.sin(angle_in_radians)),
                                     fill="black",
                                     text=str(i))
+
+        self.canvas.create_text(width - 200, 50, fill="black", text="Best score:")
+        self.canvas.create_text(width - 200, 150, fill="black", text="Worst score:")
+
         self.canvas.pack(fill=BOTH, expand=1)
 
     def clock_update(self):
@@ -85,18 +93,28 @@ class Stopwatch(Frame):
 
     def reset(self):
         self.started = False
+        if self.time > self.highest:
+            self.highest = self.time
+        elif self.lowest == 0:
+            self.lowest = self.time
+        elif self.lowest > self.time > 0:
+            self.lowest = self.time
+
         self.time_counted = 0
-        self.canvas.delete(self.milliseconds_line, self.seconds_line, self.minutes_line)
+        self.canvas.delete(self.milliseconds_line, self.seconds_line, self.minutes_line, self.best_score_text,
+                           self.worst_score_text)
         self.milliseconds_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.milliseconds_line_len)
         self.seconds_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.seconds_line_len)
         self.minutes_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.minutes_line_len)
+        self.best_score_text = self.canvas.create_text(500, 100, fill="black", text=str(self.lowest/1000))
+        self.worst_score_text = self.canvas.create_text(500, 200, fill="black", text=str(self.highest/1000))
         self.button.destroy()
         self.button = Button(self.button_frame, text="Start", command=self.start)
         self.button.grid(row=0, column=1, sticky=W + E)
 
 
 def main():
-    width = 500
+    width = 700
     height = 500
 
     root = Tk()
