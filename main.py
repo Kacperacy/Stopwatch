@@ -163,7 +163,7 @@ class Stopwatch(Frame):
             self.recent_scores.append(self.time)
             del self.recent_scores[0]
 
-        
+
 
         self.time_counted = 0
         self.canvas.delete(self.stopwatch_milliseconds_line, self.stopwatch_seconds_line, self.stopwatch_minutes_line,
