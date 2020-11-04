@@ -14,6 +14,8 @@ class Stopwatch(Frame):
         self.highest = 0
         self.lowest = 0
         self.started = False
+        self.recent_scores = []
+        self.score_text = []
         self.milliseconds_line_len = self.height / 3
         self.seconds_line_len = self.height / 4
         self.minutes_line_len = self.height / 6
@@ -67,6 +69,7 @@ class Stopwatch(Frame):
 
         self.canvas.create_text(self.x * 2, self.height + 100, fill="black", text="Best score:")
         self.canvas.create_text(self.x * 2, self.height + 150, fill="black", text="Worst score:")
+        self.canvas.create_text(self.x * 3, self.height + 100, fill="black", text="Recent score:")
 
         self.canvas.pack(fill=BOTH, expand=1)
         self.clock_update()
@@ -92,7 +95,8 @@ class Stopwatch(Frame):
                                                             hours_angle_in_radians)),
                                                         round(self.y + self.minutes_line_len * math.sin(
                                                             hours_angle_in_radians)))
-        self.clock_text = self.canvas.create_text(self.height * 1.5, self.width + 50, fill="black", text=time.strftime('%H:%M:%S %p'))
+        self.clock_text = self.canvas.create_text(self.height * 1.5, self.width + 50, fill="black",
+                                                  text=time.strftime('%H:%M:%S %p'))
         self.after(1000, self.clock_update)
 
     def stopwatch_update(self):
@@ -122,7 +126,9 @@ class Stopwatch(Frame):
                                                                       minutes_angle_in_radians)))
 
             self.stopwatch_text = self.canvas.create_text(self.width * 0.5, self.height + 50, fill="black",
-                                                      text=str(self.time//1000 // 60)+" m "+str(self.time//1000 % 60)+" s "+str(self.time%1000)+" ms")
+                                                          text=str(self.time // 1000 // 60) + " m " + str(
+                                                              self.time // 1000 % 60) + " s " + str(
+                                                              self.time % 1000) + " ms")
 
             self.after(1, self.stopwatch_update)
 
@@ -151,17 +157,28 @@ class Stopwatch(Frame):
         elif self.lowest > self.time > 0:
             self.lowest = self.time
 
+        if len(self.recent_scores) <= 10:
+            self.recent_scores.append(self.time)
+        else:
+            self.recent_scores.append(self.time)
+            del self.recent_scores[0]
+
+        
+
         self.time_counted = 0
         self.canvas.delete(self.stopwatch_milliseconds_line, self.stopwatch_seconds_line, self.stopwatch_minutes_line,
                            self.best_score_text,
-                           self.worst_score_text,self.stopwatch_text)
+                           self.worst_score_text, self.stopwatch_text)
         self.stopwatch_milliseconds_line = self.canvas.create_line(self.x, self.y, self.x,
                                                                    self.y - self.milliseconds_line_len)
         self.stopwatch_seconds_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.seconds_line_len)
         self.stopwatch_minutes_line = self.canvas.create_line(self.x, self.y, self.x, self.y - self.minutes_line_len)
-        self.best_score_text = self.canvas.create_text(self.x * 2, self.height + 120, fill="black", text=str(self.lowest/1000))
-        self.worst_score_text = self.canvas.create_text(self.x * 2, self.height + 170, fill="black", text=str(self.highest/1000))
-        self.stopwatch_text = self.canvas.create_text(self.width * 0.5, self.height + 50, fill="black",text="0 m 0 s 0 ms")
+        self.best_score_text = self.canvas.create_text(self.x * 2, self.height + 120, fill="black",
+                                                       text=str(self.lowest / 1000))
+        self.worst_score_text = self.canvas.create_text(self.x * 2, self.height + 170, fill="black",
+                                                        text=str(self.highest / 1000))
+        self.stopwatch_text = self.canvas.create_text(self.width * 0.5, self.height + 50, fill="black",
+                                                      text="0 m 0 s 0 ms")
         self.button.destroy()
         self.button = Button(self.button_frame, text="Start", command=self.start)
         self.button.grid(row=0, column=1, sticky=W + E)
@@ -169,7 +186,7 @@ class Stopwatch(Frame):
 
 def main():
     width = 800
-    height = 800
+    height = 700
 
     root = Tk()
     stopwatch = Stopwatch(root)
