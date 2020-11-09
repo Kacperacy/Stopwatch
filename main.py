@@ -14,8 +14,7 @@ class Stopwatch(Frame):
         self.highest = 0
         self.lowest = 0
         self.started = False
-        self.recent_scores = []
-        self.score_text = []
+        self.recent_scores = [0, 0, 0, 0, 0]
         self.milliseconds_line_len = self.height / 3
         self.seconds_line_len = self.height / 4
         self.minutes_line_len = self.height / 6
@@ -26,6 +25,11 @@ class Stopwatch(Frame):
         self.pack(fill=BOTH, expand=1)
         self.best_score_text = self.canvas.create_text(self.width - 200, 100)
         self.worst_score_text = self.canvas.create_text(self.width - 200, 200)
+        self.recent1 = self.canvas.create_text(self.x * 3, self.height + 120)
+        self.recent2 = self.canvas.create_text(self.x * 3, self.height + 140)
+        self.recent3 = self.canvas.create_text(self.x * 3, self.height + 160)
+        self.recent4 = self.canvas.create_text(self.x * 3, self.height + 180)
+        self.recent5 = self.canvas.create_text(self.x * 3, self.height + 200)
         self.stopwatch_text = self.canvas.create_text(self.width * 2, 50)
         self.clock_text = self.canvas.create_text(self.width * 2, self.height * 2 + 50)
         self.stopwatch_milliseconds_line = self.canvas.create_line(self.x, self.y, self.x,
@@ -157,15 +161,29 @@ class Stopwatch(Frame):
         elif self.lowest > self.time > 0:
             self.lowest = self.time
 
-        if len(self.recent_scores) <= 10:
-            self.recent_scores.append(self.time)
-        else:
+        if self.time != 0:
             self.recent_scores.append(self.time)
             del self.recent_scores[0]
 
-
+        self.canvas.itemconfig(self.recent1, text=str(self.recent_scores[4] // 1000 // 60) + " m " + str(
+                                                              self.recent_scores[4] // 1000 % 60) + " s " + str(
+                                                              self.recent_scores[4] % 1000) + " ms")
+        self.canvas.itemconfig(self.recent2, text=str(self.recent_scores[3] // 1000 // 60) + " m " + str(
+                                                              self.recent_scores[3] // 1000 % 60) + " s " + str(
+                                                              self.recent_scores[3] % 1000) + " ms")
+        self.canvas.itemconfig(self.recent3, text=str(self.recent_scores[2] // 1000 // 60) + " m " + str(
+                                                              self.recent_scores[2] // 1000 % 60) + " s " + str(
+                                                              self.recent_scores[2] % 1000) + " ms")
+        self.canvas.itemconfig(self.recent4, text=str(self.recent_scores[1] // 1000 // 60) + " m " + str(
+                                                              self.recent_scores[1] // 1000 % 60) + " s " + str(
+                                                              self.recent_scores[1] % 1000) + " ms")
+        self.canvas.itemconfig(self.recent5, text=str(self.recent_scores[0] // 1000 // 60) + " m " + str(
+                                                              self.recent_scores[0] // 1000 % 60) + " s " + str(
+                                                              self.recent_scores[0] % 1000) + " ms")
 
         self.time_counted = 0
+        self.time = 0
+
         self.canvas.delete(self.stopwatch_milliseconds_line, self.stopwatch_seconds_line, self.stopwatch_minutes_line,
                            self.best_score_text,
                            self.worst_score_text, self.stopwatch_text)
